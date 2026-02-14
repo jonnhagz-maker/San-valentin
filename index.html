@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>San Valentín 💘</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  overflow:hidden;
+  color:white;
+  text-align:center;
+}
+
+.bg{
+  position:fixed;
+  inset:0;
+  background:url("foto.jpg") center/cover no-repeat;
+  filter: blur(6px) brightness(.6);
+  z-index:-1;
+}
+
+.panel{
+  background:rgba(0,0,0,.45);
+  padding:30px;
+  border-radius:18px;
+  backdrop-filter: blur(6px);
+}
+
+.screen{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  transition:.8s;
+}
+.hidden{opacity:0; pointer-events:none;}
+
+/* SOBRE */
+.envelope{
+  width:320px;
+  height:210px;
+  background:#c1121f;
+  border-radius:12px;
+  position:relative;
+  box-shadow:0 10px 40px rgba(0,0,0,.5);
+}
+
+.vibrar{
+  animation:shake .4s infinite;
+}
+@keyframes shake{
+  0%{transform:translateX(-2px)}
+  50%{transform:translateX(2px)}
+  100%{transform:translateX(-2px)}
+}
+
+.flap{
+  position:absolute;
+  border-left:160px solid transparent;
+  border-right:160px solid transparent;
+  border-bottom:110px solid #e5383b;
+  top:-110px;
+  transform-origin:top;
+  transition:1s;
+}
+
+.envelope.open .flap{
+  transform:rotateX(180deg);
+}
+
+/* carta */
+.carta{
+  max-width:720px;
+  background:rgba(0,0,0,.45);
+  padding:24px;
+  border-radius:16px;
+  line-height:1.6;
+  min-height:220px;
+  white-space: pre-line;
+  font-size:18px;
+}
+
+/* botones */
+button{
+  padding:14px 26px;
+  font-size:18px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  margin:12px;
+  background:#ff2e63;
+  color:white;
+  transition:.25s;
+}
+button:hover{transform:scale(1.1);}
+
+#noBtn{
+  position:relative;
+}
+
+/* corazones */
+.heart{
+  position:fixed;
+  bottom:-20px;
+  animation:up linear forwards;
+}
+@keyframes up{
+  to{transform:translateY(-110vh);opacity:0;}
+}
+
+/* emoji final */
+.finalEmoji{
+  font-size:90px;
+  animation:pulse 1s infinite alternate;
+}
+@keyframes pulse{
+  from{transform:scale(1)}
+  to{transform:scale(1.25)}
+}
+
+.fire{
+  position:fixed;
+  font-size:22px;
+  pointer-events:none;
+  transition:1.2s;
+}
+
+h1,h2{
+  text-shadow:0 6px 18px rgba(0,0,0,.7);
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+
+<audio id="musica" loop>
+  <source src="those-eyes.mp3" type="audio/mpeg">
+</audio>
+
+<!-- P1 -->
+<div id="s1" class="screen">
+  <div class="panel">
+    <h1>FELIZ DIA DE SAN VALENTIN AMOR</h1>
+    <div id="sobre" class="envelope vibrar">
+      <div class="flap"></div>
+    </div>
+    <button onclick="abrir()">ABRIR 💌</button>
+  </div>
+</div>
+
+<!-- P2 -->
+<div id="s2" class="screen hidden">
+  <div class="carta" id="textoMaquina"></div>
+  <button id="btnCont" class="hidden" onclick="cont()">CONTINUAR ➜</button>
+</div>
+
+<!-- P3 -->
+<div id="s3" class="screen hidden">
+  <h2>¿ACEPTARIAS UNA VIDA JUNTO A MI?</h2>
+  <button onclick="si()">SI 🥰</button>
+  <button id="noBtn" onmouseover="escapar()" ontouchstart="escapar()">NO 😄</button>
+</div>
+
+<!-- P4 -->
+<div id="s4" class="screen hidden">
+  <div class="finalEmoji">🥰</div>
+  <h1 id="final"></h1>
+</div>
+
+<script>
+const mensaje = `GRACIAS POR FORMAR PARTE DE MI VIDA TODOS ESTOS AÑOS, SOS LO MEJOR QUE ME PUDO PASAR JUNTO CON BIANCA.
+SE QUE HAY VECES QUE NO PUEDO DARTE MUCHO, COMO AHORA, PERO QUERIA DECIRTE A ESTE POBRE HOMBRE TE AMA COMO NO TE IMAGINAS,
+OJALA EL PROXIMO DIA DE LOS ENAMORADOS PASEMOS JUNTOS LOS TRES,
+TE AMO DEMACIADO Y AHORIA CUALQUIER COSA POR USTEDES,
+SON MI MOTOR A SEGUIR,
+QUIERO QUE SEPAS QUE TE AMO UN MONTÓN MICA,
+GRACIAS POR EXISTIR Y FORMAR PARTE DE MI VIDA`;
+
+function abrir(){
+  const sobre=document.getElementById("sobre");
+  sobre.classList.remove("vibrar");
+  setTimeout(()=>sobre.classList.add("open"),200);
+
+  const audio=document.getElementById("musica");
+  audio.volume=0;
+  audio.play().catch(()=>{});
+  let v=0;
+  const fade=setInterval(()=>{
+    v+=0.05;
+    audio.volume=Math.min(v,1);
+    if(v>=1) clearInterval(fade);
+  },200);
+
+  setTimeout(()=>{
+    swap("s1","s2");
+    escribir();
+  },900);
+}
+
+function escribir(){
+  let i=0;
+  const box=document.getElementById("textoMaquina");
+  const timer=setInterval(()=>{
+    box.textContent += mensaje[i];
+    i++;
+    if(i>=mensaje.length){
+      clearInterval(timer);
+      document.getElementById("btnCont").classList.remove("hidden");
+    }
+  },55);
+}
+
+function cont(){ swap("s2","s3"); }
+
+function si(){
+  document.getElementById("final").innerText="TE AMO CON TODO MI SER, GRACIAS TOTALES. ❤️";
+  fuegos();
+  swap("s3","s4");
+}
+
+function swap(a,b){
+  document.getElementById(a).classList.add("hidden");
+  document.getElementById(b).classList.remove("hidden");
+}
+
+/* botón NO escapa */
+function escapar(){
+  const btn=document.getElementById("noBtn");
+  btn.style.position="absolute";
+  btn.style.left=Math.random()*80+"vw";
+  btn.style.top=Math.random()*70+"vh";
+}
+
+/* corazones */
+setInterval(()=>{
+  let h=document.createElement("div");
+  h.className="heart";
+  h.innerHTML="❤️";
+  h.style.left=Math.random()*100+"vw";
+  h.style.fontSize=(16+Math.random()*20)+"px";
+  h.style.animationDuration=(4+Math.random()*3)+"s";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),7000);
+},350);
+
+/* fuegos */
+function fuegos(){
+  for(let i=0;i<60;i++){
+    let f=document.createElement("div");
+    f.className="fire";
+    f.innerHTML="✨";
+    f.style.left="50vw";
+    f.style.top="50vh";
+    document.body.appendChild(f);
+    setTimeout(()=>{
+      f.style.transform=`translate(${(Math.random()-0.5)*900}px,${(Math.random()-0.5)*700}px) scale(1.5)`;
+      f.style.opacity=0;
+    },20);
+    setTimeout(()=>f.remove(),1400);
+  }
+}
+</script>
+
+</body>
+</html>
